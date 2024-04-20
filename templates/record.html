@@ -27,14 +27,12 @@
         <video muted id="video" width="640" height="480" autoplay></video>
         <button id="startRecording">Start Recording</button>
         <button id="stopRecording" disabled>Stop Recording</button>
-        <a id="downloadLink" style="display:none;">Download Recording</a>
     </div>
 
     <script>
         const video = document.getElementById('video');
         const startRecordingButton = document.getElementById('startRecording');
         const stopRecordingButton = document.getElementById('stopRecording');
-        const downloadLink = document.getElementById('downloadLink');
 
         let mediaRecorder;
         let recordedBlobs = [];
@@ -54,13 +52,27 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedBlobs, { type: 'video/mp4' });
-                    const url = URL.createObjectURL(blob);
-                    downloadLink.href = url;
-                    downloadLink.download = 'recording.mp4';
-                    downloadLink.style.display = 'inline';
-                    recordedBlobs = [];
-                };
+					const blob = new Blob(recordedBlobs, { type: 'video/mp4' });
+					const formData = new FormData();
+					formData.append('video', blob, 'recording.mp4');
+
+					fetch('/save-video', {
+						method: 'POST',
+						body: formData
+					})
+					.then(response => {
+					if (response.ok) {
+                        console.log('Video saved successfully');
+					} else {
+                        console.error('Error saving video');
+					}
+					})
+					.catch(error => {
+						console.error('Error saving video:', error);
+					});
+
+					recordedBlobs = [];
+				};
 
                 startRecordingButton.addEventListener('click', () => {
                     mediaRecorder.start();
