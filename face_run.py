@@ -62,7 +62,8 @@ def run_emotion_detection(video_path):
     sorted_results = {k: v['total_confidence'] for k, v in sorted(results.items(), key=lambda item: item[1]['total_confidence'], reverse=True)}
     return sorted_results
 
-# Example usage
-video_path = "WIN_20240418_17_24_52_Pro.mp4"
-emotion_results = run_emotion_detection(video_path)
-print(emotion_results)
+
+if __name__ == '__main__':
+    video_path = "videos/recording1.mp4"
+    emotion_results = run_emotion_detection(video_path)
+    print(emotion_results)
