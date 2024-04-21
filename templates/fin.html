@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FIN</title>
+    <style>
+        body {
+            background-color: #f5f5dc;
+            font-family: Calibri, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 50;
+        }
+        .container {
+            background-color: white;
+            padding: 100px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        h2 {
+            font-size: 50px;
+            font-weight: bold;
+            margin: 0;
+        }
+		table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td {
+            padding-left: 10px;
+			padding-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>FIN</h2>
+        <table id="dataTable">
+            <tr>
+                <th>File</th>
+                <th>Video</th>
+                <th>Audio</th>
+				<th>Final</th>
+            </tr>
+        </table>
+    </div>
+
+     <script>
+        // Function to create a table row
+        function createTableRow(data) {
+            const row = document.createElement('tr');
+            const fileCell = document.createElement('td');
+            const videoCell = document.createElement('td');
+            const audioCell = document.createElement('td');
+            const finalCell = document.createElement('td');
+
+
+            fileCell.textContent = data.file;
+            videoCell.textContent = data.video;
+            audioCell.textContent = data.audio;
+			finalCell.textContent = data.final;
+
+            row.appendChild(fileCell);
+            row.appendChild(videoCell);
+            row.appendChild(audioCell);
+            row.appendChild(finalCell);
+
+            return row;
+        }
+
+        // Get the table element
+        const table = document.getElementById('dataTable');
+
+        // Fetch JSON data from Flask
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(jsonData => {
+                // Iterate over the JSON data and create table rows
+                jsonData.forEach(data => {
+                    const row = createTableRow(data);
+                    table.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

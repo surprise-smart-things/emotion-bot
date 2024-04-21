@@ -63,6 +63,10 @@
 					.then(response => {
 					if (response.ok) {
                         console.log('Video saved successfully');
+						const urlParams = new URLSearchParams(window.location.search);
+						const questionNo = parseInt(urlParams.get('question_no'));
+						const nextQuestionNo = questionNo + 1;
+						window.location.href = `/question/${nextQuestionNo}`;
 					} else {
                         console.error('Error saving video');
 					}
