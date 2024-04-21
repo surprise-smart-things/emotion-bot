@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Record Answer</title>
+    <style>
+        body {
+            background-color: #f5f5dc;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Record Your Answer</h2>
+        <video muted id="video" width="640" height="480" autoplay></video>
+        <button id="startRecording">Start Recording</button>
+        <button id="stopRecording" disabled>Stop Recording</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startRecordingButton = document.getElementById('startRecording');
+        const stopRecordingButton = document.getElementById('stopRecording');
+
+        let mediaRecorder;
+        let recordedBlobs = [];
+
+        const constraints = {
+            video: true,
+            audio: true
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = event => {
+                    recordedBlobs.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+					const blob = new Blob(recordedBlobs, { type: 'video/mp4' });
+					const formData = new FormData();
+					formData.append('video', blob, 'recording.mp4');
+
+					fetch('/save-video', {
+						method: 'POST',
+						body: formData
+					})
+					.then(response => {
+					if (response.ok) {
+                        console.log('Video saved successfully');
+						const urlParams = new URLSearchParams(window.location.search);
+						const questionNo = parseInt(urlParams.get('question_no'));
+						const nextQuestionNo = questionNo + 1;
+						window.location.href = `/question/${nextQuestionNo}`;
+					} else {
+                        console.error('Error saving video');
+					}
+					})
+					.catch(error => {
+						console.error('Error saving video:', error);
+					});
+
+					recordedBlobs = [];
+				};
+
+                startRecordingButton.addEventListener('click', () => {
+                    mediaRecorder.start();
+                    startRecordingButton.disabled = true;
+                    stopRecordingButton.disabled = false;
+                });
+
+                stopRecordingButton.addEventListener('click', () => {
+                    mediaRecorder.stop();
+                    startRecordingButton.disabled = false;
+                    stopRecordingButton.disabled = true;
+                });
+            })
+            .catch(error => {
+                console.error('Error accessing webcam:', error);
+            });
+    </script>
+</body>
+</html>
