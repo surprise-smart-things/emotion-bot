@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
+from main import run as run_models
+
 
 app = Flask(__name__)
 recordings_dir = os.path.join(app.root_path, 'videos')
@@ -8,10 +10,11 @@ q = 0
 
 def make_data():
     data = []
-    for file in os.listdir(recordings_dir):
-        video = 'Positive'  # Placeholder
-        audio = '75%'  # Placeholder
-        final = 'Yes'  # Placeholder
+    for file in os.listdir('videos'):
+        results = run_models(f'videos/{file}')
+        video = str(results[0])
+        audio = str(results[1])
+        final = str(results[2])
         data.append({'file': file, 'video': video, 'audio': audio, 'final': final})
     return data
 
@@ -61,6 +64,7 @@ def save_video():
 @app.route('/get_data')
 def get_data():
     data = make_data()
+    # data = [{'file': 'file', 'video': 'video', 'audio': 'audio', 'final': 'final'}]
     return jsonify(data)
 
 
