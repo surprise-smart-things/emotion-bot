@@ -1,8 +1,8 @@
 import cv2
 import logging, os
 # logging.disable(logging.WARNING)
-# os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from keras.models import model_from_json
 import numpy as np
 
