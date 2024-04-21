@@ -6,6 +6,16 @@ recordings_dir = os.path.join(app.root_path, 'videos')
 q = 0
 
 
+def make_data():
+    data = []
+    for file in os.listdir(recordings_dir):
+        video = 'Positive'  # Placeholder
+        audio = '75%'  # Placeholder
+        final = 'Yes'  # Placeholder
+        data.append({'file': file, 'video': video, 'audio': audio, 'final': final})
+    return data
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -50,11 +60,7 @@ def save_video():
 
 @app.route('/get_data')
 def get_data():
-    data = [
-        {'file': 'file1.txt', 'video': 'Positive', 'audio': '75%', 'final': 'Yes'},
-        {'file': 'file2.png', 'video': 'Negative', 'audio': '25%', 'final': 'Yes'},
-        {'file': 'file3.pdf', 'video': 'Neutral', 'audio': '55%', 'final': 'Yes'}
-    ]
+    data = make_data()
     return jsonify(data)
 
 
