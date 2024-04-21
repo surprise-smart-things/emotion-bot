@@ -2,7 +2,7 @@ import cv2
 from keras.models import model_from_json
 import numpy as np
 
-def run_emotion_detection():
+def run_emotion_detection(video_path):
     json_file = open("emotionfacedetect2.json", "r")
     model_json = json_file.read()
     json_file.close()
@@ -19,13 +19,17 @@ def run_emotion_detection():
 
     labels = {0: 'angry', 1: 'disgust', 2: 'fear', 3: 'happy', 4: 'neutral', 5: 'sad', 6: 'surprise'}
 
-    webcam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    video = cv2.VideoCapture(video_path)
     results = {label: {'count': 0, 'total_confidence': 0} for label in labels.values()}
 
     while True:
-        i, im = webcam.read()
+        ret, im = video.read()
+        if not ret:
+            break
+
         gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(im, 1.3, 5)
+
         try:
             for (p, q, r, s) in faces:
                 image = gray[q:q + s, p:p + r]
@@ -37,15 +41,12 @@ def run_emotion_detection():
                 confidence = pred.max()
                 results[prediction_label]['count'] += 1
                 results[prediction_label]['total_confidence'] += confidence
-                cv2.putText(im, '%s: %.2f' % (prediction_label, confidence), (p - 10, q - 10),
-                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255))
-            cv2.imshow("Output", im)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+                cv2.putText(im, '%s: %.2f' % (prediction_label, confidence), (p - 10, q - 10), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255))
+                
         except cv2.error:
             pass
 
-    webcam.release()
+    video.release()
     cv2.destroyAllWindows()
 
     max_count = max(data['count'] for data in results.values())
@@ -59,8 +60,9 @@ def run_emotion_detection():
             results[emotion]['total_confidence'] = 0
 
     sorted_results = {k: v['total_confidence'] for k, v in sorted(results.items(), key=lambda item: item[1]['total_confidence'], reverse=True)}
-
     return sorted_results
 
-emotion_results = run_emotion_detection()
-print(emotion_results)  
+# Example usage
+video_path = "WIN_20240418_17_24_52_Pro.mp4"
+emotion_results = run_emotion_detection(video_path)
+print(emotion_results)
