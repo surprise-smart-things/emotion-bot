@@ -1,6 +1,11 @@
 import cv2
+import logging, os
+# logging.disable(logging.WARNING)
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from keras.models import model_from_json
 import numpy as np
+
 
 def run_emotion_detection(video_path):
     json_file = open("emotionfacedetect2.json", "r")
@@ -36,12 +41,12 @@ def run_emotion_detection(video_path):
                 cv2.rectangle(im, (p, q), (p + r, q + s), (255, 0, 0), 2)
                 image = cv2.resize(image, (48, 48))
                 img = extract_features(image)
-                pred = model.predict(img)
+                pred = model.predict(img, verbose=0)
                 prediction_label = labels[pred.argmax()]
                 confidence = pred.max()
                 results[prediction_label]['count'] += 1
                 results[prediction_label]['total_confidence'] += confidence
-                cv2.putText(im, '%s: %.2f' % (prediction_label, confidence), (p - 10, q - 10), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255))
+                # cv2.putText(im, '%s: %.2f' % (prediction_label, confidence), (p - 10, q - 10), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (0, 0, 255))
                 
         except cv2.error:
             pass
@@ -62,7 +67,8 @@ def run_emotion_detection(video_path):
     sorted_results = {k: v['total_confidence'] for k, v in sorted(results.items(), key=lambda item: item[1]['total_confidence'], reverse=True)}
     return sorted_results
 
-# Example usage
-video_path = "WIN_20240418_17_24_52_Pro.mp4"
-emotion_results = run_emotion_detection(video_path)
-print(emotion_results)
+
+if __name__ == '__main__':
+    video_path = "videos/recording1.mp4"
+    emotion_results = run_emotion_detection(video_path)
+    print(emotion_results)
