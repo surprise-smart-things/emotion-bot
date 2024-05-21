@@ -108,13 +108,13 @@ def runner(filepath):
 	fts = fts[0]
 	fts = np.expand_dims(fts, axis=0)
 	model = create_model()
-	model.load_weights('trained.h5')
+	model.load_weights('saved_weights.h5')
 	prediction = model.predict(fts, verbose=0)
 	emotion = prediction.argmax()
-	dictt = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Neutral', 5: 'Sad'}
+	dictt = [['angry'], ['calm'], ['disgust'], ['fear'], ['happy'], ['neutral'], ['sad'], ['surprise']]
 	return dictt[emotion]
 
 
 if __name__ == '__main__':
-	output = runner("1001_DFA_DIS_XX.wav")
+	output = runner("audios/happytest.mp3")
 	print(output)
